@@ -1,40 +1,19 @@
-// Clock example using a seven segment display & DS3231 real-time clock.
-//
-// Must have the Adafruit RTClib library installed too!  See:
-//   https://github.com/adafruit/RTClib
-//
-// Designed specifically to work with the Adafruit LED 7-Segment backpacks
-// and DS1307 real-time clock breakout:
-// ----> http://www.adafruit.com/products/881
-// ----> http://www.adafruit.com/products/880
-// ----> http://www.adafruit.com/products/879
-// ----> http://www.adafruit.com/products/878
-// ----> https://www.adafruit.com/products/264
-//
-// Adafruit invests time and resources providing this open source code, 
-// please support Adafruit and open-source hardware by purchasing 
-// products from Adafruit!
-//
-// Written by Tony DiCola for Adafruit Industries.
-// Released under a MIT license: https://opensource.org/licenses/MIT
-
+// Arduino clock based on TM1637 and DS3231
 #include <Wire.h>
-#include <Adafruit_GFX.h>
+#include <TM1637Display.h>
 #include <RTClib.h>
-#include "Adafruit_LEDBackpack.h"
 
+// TM1637 Module connection pins (Digital Pins)
+#define CLK 2
+#define DIO 3
 
 // Set to false to display time in 12 hour format, or true to use 24 hour:
 #define TIME_24_HOUR      false
 
-// I2C address of the display.  Stick with the default address of 0x70
-// unless you've changed the address jumpers on the back of the display.
-#define DISPLAY_ADDRESS   0x70
-
-
 // Create display and DS1307 objects.  These are global variables that
 // can be accessed from both the setup and loop function below.
-Adafruit_7segment clockDisplay = Adafruit_7segment();
+TM1637Display clockDisplay(CLK, DIO);
+
 //RTC_DS1307 rtc = RTC_DS1307();
 RTC_DS3231 rtc;
 
@@ -60,8 +39,7 @@ void setup() {
   delay(3000); // wait for console opening
 
   // Setup the display.
-  clockDisplay.begin(DISPLAY_ADDRESS);
-  clockDisplay.setBrightness(15);
+  clockDisplay.setBrightness(1);
   // Setup the DS3231 real-time clock.
   rtc.begin();
 
@@ -146,27 +124,30 @@ void loop() {
   }
 
   // Now print the time value to the display.
-  clockDisplay.print(displayValue, DEC);
+  //clockDisplay.print(displayValue, DEC);
+  clockDisplay.showNumberDec(displayValue);
 
   // Add zero padding when in 24 hour mode and it's midnight.
   // In this case the print function above won't have leading 0's
   // which can look confusing.  Go in and explicitly add these zeros.
   if (TIME_24_HOUR && hours == 0) {
     // Pad hour 0.
-    clockDisplay.writeDigitNum(1, 0);
+// FIXME clockDisplay.writeDigitNum(1, 0);
     // Also pad when the 10's minute is 0 and should be padded.
     if (minutes < 10) {
-      clockDisplay.writeDigitNum(2, 0);
+// FIXME clockDisplay.writeDigitNum(2, 0);
     }
   }
 
   // Blink the colon by flipping its value every loop iteration
   // (which happens every second).
   blinkColon = !blinkColon;
-  clockDisplay.drawColon(blinkColon);
+//  clockDisplay.drawColon(blinkColon);
+if (blinkColon)    clockDisplay.showNumberDecEx(displayValue, (0x80 >> 1), true);
+ else   clockDisplay.showNumberDecEx(displayValue, (0x80 >> 0), true);
 
   // Now push out to the display the new values that were set above.
-  clockDisplay.writeDisplay();
+//  clockDisplay.writeDisplay();
 
   // Pause for a second for time to elapse.  This value is in milliseconds
   // so 1000 milliseconds = 1 second.

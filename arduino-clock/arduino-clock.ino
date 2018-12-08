@@ -123,15 +123,15 @@ void loop() {
     }
   }
 
-  // Now print the time value to the display.
-  clockDisplay.showNumberDec(displayValue);
+  // Now print the time value to the display (merged with blink to avoid flicker).
+  //clockDisplay.showNumberDec(displayValue);
 
   // Blink the colon by flipping its value every loop iteration
   // (which happens every second).
   blinkColon = !blinkColon;
-//  clockDisplay.drawColon(blinkColon);
-if (blinkColon)    clockDisplay.showNumberDecEx(displayValue, (0x80 >> 1), true);
- else   clockDisplay.showNumberDecEx(displayValue, (0x80 >> 0), true);
+
+  if (blinkColon) clockDisplay.showNumberDecEx(displayValue, (0x80 >> 1), true);
+  else clockDisplay.showNumberDecEx(displayValue, (0x80 >> 0), true);
 
   // Pause for a second for time to elapse.  This value is in milliseconds
   // so 1000 milliseconds = 1 second.

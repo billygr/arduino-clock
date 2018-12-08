@@ -7,6 +7,8 @@
 #define CLK 2
 #define DIO 3
 
+// DS3231 is I2C based, module is connected to A4 (SDA), A5 (SCL)
+
 // Set to false to display time in 12 hour format, or true to use 24 hour:
 #define TIME_24_HOUR      false
 
@@ -14,7 +16,6 @@
 // can be accessed from both the setup and loop function below.
 TM1637Display clockDisplay(CLK, DIO);
 
-//RTC_DS1307 rtc = RTC_DS1307();
 RTC_DS3231 rtc;
 
 // Keep track of the hours, minutes, seconds displayed by the clock.
@@ -58,7 +59,6 @@ void setup() {
     // January 21, 2014 at 3am you would call:
     // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
-
   
   /*
   bool setClockTime = !rtc.isrunning();
@@ -124,20 +124,7 @@ void loop() {
   }
 
   // Now print the time value to the display.
-  //clockDisplay.print(displayValue, DEC);
   clockDisplay.showNumberDec(displayValue);
-
-  // Add zero padding when in 24 hour mode and it's midnight.
-  // In this case the print function above won't have leading 0's
-  // which can look confusing.  Go in and explicitly add these zeros.
-  if (TIME_24_HOUR && hours == 0) {
-    // Pad hour 0.
-// FIXME clockDisplay.writeDigitNum(1, 0);
-    // Also pad when the 10's minute is 0 and should be padded.
-    if (minutes < 10) {
-// FIXME clockDisplay.writeDigitNum(2, 0);
-    }
-  }
 
   // Blink the colon by flipping its value every loop iteration
   // (which happens every second).
@@ -145,9 +132,6 @@ void loop() {
 //  clockDisplay.drawColon(blinkColon);
 if (blinkColon)    clockDisplay.showNumberDecEx(displayValue, (0x80 >> 1), true);
  else   clockDisplay.showNumberDecEx(displayValue, (0x80 >> 0), true);
-
-  // Now push out to the display the new values that were set above.
-//  clockDisplay.writeDisplay();
 
   // Pause for a second for time to elapse.  This value is in milliseconds
   // so 1000 milliseconds = 1 second.

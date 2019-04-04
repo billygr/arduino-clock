@@ -10,7 +10,7 @@
 // DS3231 is I2C based, module is connected to A4 (SDA), A5 (SCL)
 
 // Set to false to display time in 12 hour format, or true to use 24 hour:
-#define TIME_24_HOUR      false
+#define TIME_24_HOUR      true
 
 // Create display and DS1307 objects.  These are global variables that
 // can be accessed from both the setup and loop function below.
@@ -36,11 +36,10 @@ void setup() {
 
   // Setup Serial port to print debug output.
   Serial.begin(115200);
-  Serial.println("Clock starting!");
-  delay(3000); // wait for console opening
+  Serial.println("Arduino Clock");
 
   // Setup the display.
-  clockDisplay.setBrightness(1);
+  clockDisplay.setBrightness(0);
   // Setup the DS3231 real-time clock.
   rtc.begin();
 
@@ -60,8 +59,9 @@ void setup() {
     // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
   
-  /*
-  bool setClockTime = !rtc.isrunning();
+  
+  //bool setClockTime = !rtc.isrunning(); // DS3231 not implemented
+  bool setClockTime = false;
   // Alternatively you can force the clock to be set again by
   // uncommenting this line:
   //setClockTime = true;
@@ -74,7 +74,7 @@ void setup() {
     // for example to set January 21, 2014 at 3am you would uncomment:
     //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
-*/
+
   
 }
 

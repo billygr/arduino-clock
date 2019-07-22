@@ -14,6 +14,8 @@ env:
 before_install:
   - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
 install:
+  # Note that every library should be installed in a seperate command
+  - if [ ! -d "$HOME/arduino_ide/libraries/TM1637" ]; then git clone https://github.com/avishorp/TM1637 $HOME/arduino_ide/libraries/TM1637; fi
 script:
   - build_platform uno
 notifications:

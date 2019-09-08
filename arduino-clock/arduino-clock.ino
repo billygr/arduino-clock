@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <TM1637Display.h>
 #include <RTClib.h>
+#include <LowPower.h>
 
 // TM1637 Module connection pins (Digital Pins)
 #define CLK 2
@@ -135,7 +136,8 @@ void loop() {
 
   // Pause for a second for time to elapse.  This value is in milliseconds
   // so 1000 milliseconds = 1 second.
-  delay(1000);
+  //delay(1000);
+  LowPower.powerDown(SLEEP_1S, ADC_OFF, BOD_OFF);
 
   // Now increase the seconds by one.
   seconds += 1;

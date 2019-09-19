@@ -16,7 +16,7 @@ before_install:
 install:
   # Note that every library should be installed in a seperate command
   - arduino --install-library "RTClib"
-  - arduino --install-library "LowPower"
+  - arduino --install-library "Low-Power"
   - if [ ! -d "$HOME/arduino_ide/libraries/TM1637" ]; then git clone https://github.com/avishorp/TM1637 $HOME/arduino_ide/libraries/TM1637; fi
 script:
   - build_platform uno

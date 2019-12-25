@@ -1,5 +1,6 @@
 // Arduino clock based on TM1637 and DS3231
 #include <Wire.h>
+#include <EEPROM.h>
 #include <TM1637Display.h>
 #include <RTClib.h>
 #include <LowPower.h>
@@ -26,6 +27,7 @@ int hours = 0;
 int minutes = 0;
 int seconds = 0;
 
+int DST;
 // Remember if the colon was drawn on the display so it can be blinked
 // on and off every second.
 bool blinkColon = false;
@@ -38,6 +40,19 @@ void setup() {
   // Setup Serial port to print debug output.
   Serial.begin(115200);
   Serial.println("Arduino Clock");
+
+  // Check DST settings
+  DST = EEPROM.get(0, DST);
+
+  if(DST != 0 && DST != 1)
+  {
+    DST = 1;
+    EEPROM.put(0, DST);
+  }
+
+  // Uncomment the following 2 lines if you need to set the DST (if you miss the actual day etc). Change the +1 to -1 in the fall.
+  // DateTime t2 = rtc.now();
+  // rtc.adjust(DateTime(t2.year(), t2.month(), t2.day(), t2.hour()+1, t2.minute(), t2.second()))
 
   // Setup the display.
   clockDisplay.setBrightness(0);
@@ -59,8 +74,8 @@ void setup() {
     // January 21, 2014 at 3am you would call:
     // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
-  
-  
+
+
   //bool setClockTime = !rtc.isrunning(); // DS3231 not implemented
   bool setClockTime = false;
   // Alternatively you can force the clock to be set again by
@@ -88,6 +103,21 @@ void loop() {
   if (minutes == 0) {
     // Get the time from the DS3231.
     DateTime now = rtc.now();
+
+    // Adjust according to DST
+    if (now.dayOfTheWeek() == 0 && now.month() == 3 && now.day() >= 8 && now.day() <= 16 && now.hour() == 2 && now.minute() == 0 && now.second() == 0 && DST == 0)
+    {
+      rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour()+1, now.minute(), now.second()));
+      DST = 1;
+      EEPROM.put(0, DST);
+    }
+    else if(now.dayOfTheWeek() == 0 && now.month() == 11 && now.day() >= 1 && now.day() <= 8 && now.hour() == 2 && now.minute() == 0 && now.second() == 0 && DST == 1)
+    {
+      rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour()-1, now.minute(), now.second()));
+      DST = 0;
+      EEPROM.put(0, DST);
+    }
+
     // Print out the time for debug purposes:
     Serial.print("Read date & time from DS3231: ");
     Serial.print(now.year(), DEC);
